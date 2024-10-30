@@ -1,4 +1,6 @@
+#include <iostream>
 #include "../include/file_parser.h"
+#include "../include/data_containers.h"
 #include "../include/quad.h"
 
 double f1(double x)
@@ -18,17 +20,42 @@ int main()
   // globalData.parseFile("Test1_4_4.txt");
   // globalData.print();
 
-  std::cout << "Gauss1D: (1): " << gauss1D(f1, 1) << std::endl;
-  std::cout << "Gauss1D: (2): " << gauss1D(f1, 2) << std::endl;
-  std::cout << "Gauss1D: (3): " << gauss1D(f1, 3) << std::endl;
-  std::cout << "Gauss2D: (1): " << gauss2D(f2, 1) << std::endl;
-  std::cout << "Gauss2D: (2): " << gauss2D(f2, 2) << std::endl;
-  std::cout << "Gauss2D: (3): " << gauss2D(f2, 3) << std::endl;
+  Grid grid(4, 1);
+  Node node1(0.0, 0.0);
+  Node node2(0.025, 0.0);
+  Node node3(0.025, 0.025);
+  Node node4(0.0, 0.025);
+  grid.nodes[0] = node1;
+  grid.nodes[1] = node2;
+  grid.nodes[2] = node3;
+  grid.nodes[3] = node4;
 
-  std::cout << "Rect1D (5): " << rect1D(f1, 5) << std::endl;
-  std::cout << "Rect1D (10): " << rect1D(f1, 10) << std::endl;
-  std::cout << "Rect1D (20): " << rect1D(f1, 20) << std::endl;
-  std::cout << "Rect1D (50): " << rect1D(f1, 50) << std::endl;
+  Element element;
+  element.nodeIds[0] = 0;
+  element.nodeIds[1] = 1;
+  element.nodeIds[2] = 2;
+  element.nodeIds[3] = 3;
+  grid.elements[0] = element;
 
+  UniversalElement uE;
+  uE.initialize();
+
+  for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS; i++)
+  {
+
+    grid.elements[0].jacobians[i].J[0][0] = uE.dN_dKsi[i][0] * grid.nodes[0].x + uE.dN_dKsi[i][1] * grid.nodes[1].x + uE.dN_dKsi[i][2] * grid.nodes[2].x + uE.dN_dKsi[i][3] * grid.nodes[3].x;
+    grid.elements[0].jacobians[i].J[0][1] = uE.dN_dKsi[i][0] * grid.nodes[0].y + uE.dN_dKsi[i][1] * grid.nodes[1].y + uE.dN_dKsi[i][2] * grid.nodes[2].y + uE.dN_dKsi[i][3] * grid.nodes[3].y;
+    grid.elements[0].jacobians[i].J[1][0] = uE.dN_dEta[i][0] * grid.nodes[0].x + uE.dN_dEta[i][1] * grid.nodes[1].x + uE.dN_dEta[i][2] * grid.nodes[2].x + uE.dN_dEta[i][3] * grid.nodes[3].x;
+    grid.elements[0].jacobians[i].J[1][1] = uE.dN_dEta[i][0] * grid.nodes[0].y + uE.dN_dEta[i][1] * grid.nodes[1].y + uE.dN_dEta[i][2] * grid.nodes[2].y + uE.dN_dEta[i][3] * grid.nodes[3].y;
+    grid.elements[0].jacobians[i].inverse();
+  }
+
+  for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS; i++)
+  {
+    std::cout << "=== PC " << i + 1 << " ===\n";
+    grid.elements[0].jacobians[i].printJ();
+    grid.elements[0].jacobians[i].printInvJ();
+    std::cout << "det: " << grid.elements[0].jacobians[0].detJ << "\n\n";
+  }
   return 0;
 }

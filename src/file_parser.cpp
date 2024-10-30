@@ -82,23 +82,5 @@ void GlobalData::print()
     std::cout << "Number of Nodes: " << grid.amountOfNodes << std::endl;
     std::cout << "Number of Elements: " << grid.amountOfElements << std::endl;
 
-    std::cout << "\n=== Nodes: ===\n";
-    for (int i = 0; i < grid.amountOfNodes; ++i)
-        std::cout << "Node " << (i + 1) << ": ("
-                  << grid.nodes[i].x << ", "
-                  << grid.nodes[i].y << ")\n";
-
-    std::cout << "\n=== Elements: ===\n";
-    for (int i = 0; i < grid.amountOfElements; ++i)
-        std::cout << "Element " << (i + 1) << ": ("
-                  << grid.elements[i].nodeIds[0] + 1 << ", "
-                  << grid.elements[i].nodeIds[1] + 1 << ", "
-                  << grid.elements[i].nodeIds[2] + 1 << ", "
-                  << grid.elements[i].nodeIds[3] + 1 << ")\n";
-}
-
-GlobalData::~GlobalData()
-{
-    delete[] grid.nodes;
-    delete[] grid.elements;
+    grid.print();
 }

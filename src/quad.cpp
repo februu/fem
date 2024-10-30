@@ -1,5 +1,4 @@
 #include "../include/quad.h"
-#include <stdexcept>
 
 double rect1D(double (*func)(double), int N)
 {

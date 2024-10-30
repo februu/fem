@@ -5,25 +5,7 @@
 #include <sstream>
 #include <limits>
 
-const int NODES_PER_ELEMENT = 4;
-
-struct Node
-{
-    double x, y;
-};
-
-struct Element
-{
-    int nodeIds[NODES_PER_ELEMENT];
-};
-
-struct Grid
-{
-    int amountOfNodes;
-    int amountOfElements;
-    Node *nodes;
-    Element *elements;
-};
+#include "data_containers.h"
 
 struct GlobalData
 {
@@ -39,5 +21,4 @@ struct GlobalData
 
     void parseFile(const std::string &fileName);
     void print();
-    ~GlobalData();
 };

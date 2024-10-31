@@ -27,6 +27,9 @@ struct Element
 {
     int nodeIds[NODES_PER_ELEMENT];
     Jacobian jacobians[NUMBER_OF_INTEGRATION_POINTS];
+    double dN_dx[NUMBER_OF_INTEGRATION_POINTS][4];
+    double dN_dy[NUMBER_OF_INTEGRATION_POINTS][4];
+    double H[4][4] = {0};
 };
 
 struct Grid
@@ -49,22 +52,7 @@ struct Grid
         delete[] elements;
     }
 
-    void print()
-    {
-        std::cout << "\n=== Nodes: ===\n";
-        for (int i = 0; i < amountOfNodes; ++i)
-            std::cout << "Node " << (i + 1) << ": ("
-                      << nodes[i].x << ", "
-                      << nodes[i].y << ")\n";
-
-        std::cout << "\n=== Elements: ===\n";
-        for (int i = 0; i < amountOfElements; ++i)
-            std::cout << "Element " << (i + 1) << ": ("
-                      << elements[i].nodeIds[0] + 1 << ", "
-                      << elements[i].nodeIds[1] + 1 << ", "
-                      << elements[i].nodeIds[2] + 1 << ", "
-                      << elements[i].nodeIds[3] + 1 << ")\n";
-    }
+    void print();
 };
 
 struct UniversalElement

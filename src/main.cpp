@@ -21,41 +21,56 @@ int main()
   // globalData.print();
 
   Grid grid(4, 1);
-  Node node1(0.0, 0.0);
-  Node node2(0.025, 0.0);
-  Node node3(0.025, 0.025);
-  Node node4(0.0, 0.025);
-  grid.nodes[0] = node1;
-  grid.nodes[1] = node2;
-  grid.nodes[2] = node3;
-  grid.nodes[3] = node4;
+  Node n1(0.0, 0.0);
+  Node n2(0.025, 0.0);
+  Node n3(0.025, 0.025);
+  Node n4(0.0, 0.025);
+  grid.nodes[0] = n1;
+  grid.nodes[1] = n2;
+  grid.nodes[2] = n3;
+  grid.nodes[3] = n4;
 
-  Element element;
-  element.nodeIds[0] = 0;
-  element.nodeIds[1] = 1;
-  element.nodeIds[2] = 2;
-  element.nodeIds[3] = 3;
-  grid.elements[0] = element;
+  Element e;
+  e.nodeIds[0] = 0;
+  e.nodeIds[1] = 1;
+  e.nodeIds[2] = 2;
+  e.nodeIds[3] = 3;
+  grid.elements[0] = e;
 
   UniversalElement uE;
   uE.initialize();
 
-  for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS; i++)
-  {
-
-    grid.elements[0].jacobians[i].J[0][0] = uE.dN_dKsi[i][0] * grid.nodes[0].x + uE.dN_dKsi[i][1] * grid.nodes[1].x + uE.dN_dKsi[i][2] * grid.nodes[2].x + uE.dN_dKsi[i][3] * grid.nodes[3].x;
-    grid.elements[0].jacobians[i].J[0][1] = uE.dN_dKsi[i][0] * grid.nodes[0].y + uE.dN_dKsi[i][1] * grid.nodes[1].y + uE.dN_dKsi[i][2] * grid.nodes[2].y + uE.dN_dKsi[i][3] * grid.nodes[3].y;
-    grid.elements[0].jacobians[i].J[1][0] = uE.dN_dEta[i][0] * grid.nodes[0].x + uE.dN_dEta[i][1] * grid.nodes[1].x + uE.dN_dEta[i][2] * grid.nodes[2].x + uE.dN_dEta[i][3] * grid.nodes[3].x;
-    grid.elements[0].jacobians[i].J[1][1] = uE.dN_dEta[i][0] * grid.nodes[0].y + uE.dN_dEta[i][1] * grid.nodes[1].y + uE.dN_dEta[i][2] * grid.nodes[2].y + uE.dN_dEta[i][3] * grid.nodes[3].y;
-    grid.elements[0].jacobians[i].inverse();
-  }
+  Element *element = &grid.elements[0];
 
   for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS; i++)
   {
-    std::cout << "=== PC " << i + 1 << " ===\n";
-    grid.elements[0].jacobians[i].printJ();
-    grid.elements[0].jacobians[i].printInvJ();
-    std::cout << "det: " << grid.elements[0].jacobians[0].detJ << "\n\n";
+
+    element->jacobians[i].J[0][0] = uE.dN_dKsi[i][0] * grid.nodes[0].x + uE.dN_dKsi[i][1] * grid.nodes[1].x + uE.dN_dKsi[i][2] * grid.nodes[2].x + uE.dN_dKsi[i][3] * grid.nodes[3].x;
+    element->jacobians[i].J[0][1] = uE.dN_dKsi[i][0] * grid.nodes[0].y + uE.dN_dKsi[i][1] * grid.nodes[1].y + uE.dN_dKsi[i][2] * grid.nodes[2].y + uE.dN_dKsi[i][3] * grid.nodes[3].y;
+    element->jacobians[i].J[1][0] = uE.dN_dEta[i][0] * grid.nodes[0].x + uE.dN_dEta[i][1] * grid.nodes[1].x + uE.dN_dEta[i][2] * grid.nodes[2].x + uE.dN_dEta[i][3] * grid.nodes[3].x;
+    element->jacobians[i].J[1][1] = uE.dN_dEta[i][0] * grid.nodes[0].y + uE.dN_dEta[i][1] * grid.nodes[1].y + uE.dN_dEta[i][2] * grid.nodes[2].y + uE.dN_dEta[i][3] * grid.nodes[3].y;
+    element->jacobians[i].inverse();
+
+    // Calculate dN_dx and dN_dy
+    for (int j = 0; j < 4; j++)
+    {
+      element->dN_dx[i][j] = element->jacobians[i].invJ[0][0] * uE.dN_dKsi[i][j] + element->jacobians[i].invJ[0][1] * uE.dN_dEta[i][j];
+      element->dN_dy[i][j] = element->jacobians[i].invJ[1][0] * uE.dN_dKsi[i][j] + element->jacobians[i].invJ[1][1] * uE.dN_dEta[i][j];
+    }
+
+    // FIXME: Calculate H (multiply by weight!!!!)
+    for (int j = 0; j < 4; j++)
+      for (int k = 0; k < 4; k++)
+        element->H[j][k] += 30 * (element->dN_dx[i][j] * element->dN_dx[i][k] + element->dN_dy[i][j] * element->dN_dy[i][k]) * element->jacobians[i].detJ * 1 * 1;
   }
+
+  // Print H
+  for (int j = 0; j < 4; j++)
+  {
+    for (int k = 0; k < 4; k++)
+      std::cout << element->H[j][k] << " ";
+    std::cout << "\n";
+  }
+
   return 0;
 }

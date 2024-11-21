@@ -49,6 +49,41 @@ struct Grid
         elements = new Element[amountOfElements];
     }
 
+    // Copy constructor
+    Grid(const Grid &other) : amountOfNodes(other.amountOfNodes), amountOfElements(other.amountOfElements)
+    {
+        nodes = new Node[amountOfNodes];
+        elements = new Element[amountOfElements];
+
+        for (int i = 0; i < amountOfNodes; i++)
+            nodes[i] = other.nodes[i];
+
+        for (int i = 0; i < amountOfElements; i++)
+            elements[i] = other.elements[i];
+    }
+
+    Grid &operator=(const Grid &other)
+    {
+        if (this != &other)
+        {
+            delete[] nodes;
+            delete[] elements;
+
+            amountOfNodes = other.amountOfNodes;
+            amountOfElements = other.amountOfElements;
+
+            nodes = new Node[amountOfNodes];
+            elements = new Element[amountOfElements];
+
+            for (int i = 0; i < amountOfNodes; i++)
+                nodes[i] = other.nodes[i];
+
+            for (int i = 0; i < amountOfElements; i++)
+                elements[i] = other.elements[i];
+        }
+        return *this;
+    }
+
     ~Grid()
     {
         delete[] nodes;

@@ -20,5 +20,3 @@ $(TARGET): $(BUILD_DIR) $(OBJS)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-clean:
-	rm -rf $(BUILD_DIR) $(TARGET)

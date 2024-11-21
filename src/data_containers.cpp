@@ -63,8 +63,5 @@ void UniversalElement::initialize()
             dN_dEta[currentIndex][1] = -0.25 * (1 + gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][i]);
             dN_dEta[currentIndex][2] = 0.25 * (1 + gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][i]);
             dN_dEta[currentIndex][3] = 0.25 * (1 - gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][i]);
-
-            // std::cout << dN_dKsi[currentIndex][0] << " " << dN_dKsi[currentIndex][1] << " " << dN_dKsi[currentIndex][2] << " " << dN_dKsi[currentIndex][3] << "\n";
-            // std::cout << dN_dEta[currentIndex][0] << " " << dN_dEta[currentIndex][1] << " " << dN_dEta[currentIndex][2] << " " << dN_dEta[currentIndex][3] << "\n";
         }
 }

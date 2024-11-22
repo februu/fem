@@ -1,9 +1,8 @@
 #pragma once
 
-#include <cmath>
+#include "quad.h"
 
 const int NODES_PER_ELEMENT = 4;
-const int NUMBER_OF_INTEGRATION_POINTS = 2;
 const int NUMBER_OF_INTEGRATION_POINTS_2D = NUMBER_OF_INTEGRATION_POINTS * NUMBER_OF_INTEGRATION_POINTS;
 
 struct Jacobian
@@ -99,4 +98,62 @@ struct UniversalElement
     double dN_dEta[NUMBER_OF_INTEGRATION_POINTS_2D][4];
 
     void initialize();
+};
+
+struct Solution
+{
+    double **H;
+    int amountOfNodes;
+
+    Solution(int amountOfNodes) : amountOfNodes(amountOfNodes)
+    {
+        H = new double *[amountOfNodes];
+        for (int i = 0; i < amountOfNodes; i++)
+            H[i] = new double[amountOfNodes];
+
+        for (int i = 0; i < amountOfNodes; i++)
+            for (int j = 0; j < amountOfNodes; j++)
+                H[i][j] = 0;
+    }
+
+    Solution(const Solution &other) : amountOfNodes(other.amountOfNodes)
+    {
+        H = new double *[amountOfNodes];
+        for (int i = 0; i < amountOfNodes; i++)
+            H[i] = new double[amountOfNodes];
+
+        for (int i = 0; i < amountOfNodes; i++)
+            for (int j = 0; j < amountOfNodes; j++)
+                H[i][j] = other.H[i][j];
+    }
+
+    Solution &operator=(const Solution &other)
+    {
+        if (this != &other)
+        {
+            for (int i = 0; i < amountOfNodes; i++)
+                delete[] H[i];
+            delete[] H;
+
+            amountOfNodes = other.amountOfNodes;
+
+            H = new double *[amountOfNodes];
+            for (int i = 0; i < amountOfNodes; i++)
+                H[i] = new double[amountOfNodes];
+
+            for (int i = 0; i < amountOfNodes; i++)
+                for (int j = 0; j < amountOfNodes; j++)
+                    H[i][j] = other.H[i][j];
+        }
+        return *this;
+    }
+
+    ~Solution()
+    {
+        for (int i = 0; i < amountOfNodes; i++)
+            delete[] H[i];
+        delete[] H;
+    }
+
+    void printH();
 };

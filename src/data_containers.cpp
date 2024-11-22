@@ -65,3 +65,14 @@ void UniversalElement::initialize()
             dN_dEta[currentIndex][3] = 0.25 * (1 - gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][i]);
         }
 }
+
+void Solution::printH()
+{
+    std::cout << "\n=== H (Global): ===\n";
+    for (int i = 0; i < amountOfNodes; i++)
+    {
+        for (int j = 0; j < amountOfNodes; j++)
+            std::cout << H[i][j] << " ";
+        std::cout << "\n";
+    }
+}

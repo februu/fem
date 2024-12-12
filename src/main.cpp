@@ -74,7 +74,7 @@ int main()
       for (int l = 0; l < 4; l++)
         solution.H[element->nodeIds[k]][element->nodeIds[l]] += element->H[k][l];
 
-    std::cout << "Element " << elementIndex + 1 << ":";
+    std::cout << "\nElement " << elementIndex + 1 << ":";
     element->printHbc();
   }
 

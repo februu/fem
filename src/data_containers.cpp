@@ -36,7 +36,7 @@ void Grid::print()
     for (int i = 0; i < amountOfNodes; ++i)
         std::cout << "Node " << (i + 1) << ": ("
                   << nodes[i].x << ", "
-                  << nodes[i].y << ")\n";
+                  << nodes[i].y << "), isBoundary=" << nodes[i].isBoundary << "\n";
 
     std::cout << "\n=== Elements: ===\n";
     for (int i = 0; i < amountOfElements; ++i)
@@ -49,6 +49,7 @@ void Grid::print()
 
 void UniversalElement::initialize()
 {
+    // Calculate dN_dKsi and dN_dEta
     for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS; i++)
         for (int j = 0; j < NUMBER_OF_INTEGRATION_POINTS; j++)
         {
@@ -64,6 +65,57 @@ void UniversalElement::initialize()
             dN_dEta[currentIndex][2] = 0.25 * (1 + gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][i]);
             dN_dEta[currentIndex][3] = 0.25 * (1 - gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][i]);
         }
+
+    // Calculate N in integration points for each surface
+    // 0 - bottom, 1 - right, 2 - top, 3 - left
+    // Some N functions were skipped because they are multiplied by 0
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < NUMBER_OF_INTEGRATION_POINTS; j++)
+        {
+            surfaces[0].N[j][0] = 0.5 * (1 - gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
+            surfaces[0].N[j][1] = 0.5 * (1 + gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
+
+            surfaces[1].N[j][1] = 0.5 * (1 - gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
+            surfaces[1].N[j][2] = 0.5 * (1 + gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
+
+            surfaces[2].N[j][2] = 0.5 * (1 + gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
+            surfaces[2].N[j][3] = 0.5 * (1 - gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
+
+            surfaces[3].N[j][0] = 0.5 * (1 - gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
+            surfaces[3].N[j][3] = 0.5 * (1 + gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
+        }
+}
+
+void UniversalElement::print()
+{
+    std::cout << "\n=== Universal Element: ===\n";
+    std::cout << "dN_dKsi:\n";
+    for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS_2D; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << dN_dKsi[i][j] << " ";
+        std::cout << "\n";
+    }
+
+    std::cout << "dN_dEta:\n";
+    for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS_2D; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << dN_dEta[i][j] << " ";
+        std::cout << "\n";
+    }
+
+    std::cout << "Surfaces:\n";
+    for (int i = 0; i < 4; i++)
+    {
+        std::cout << "Surface " << i << ":\n";
+        for (int j = 0; j < NUMBER_OF_INTEGRATION_POINTS; j++)
+        {
+            for (int k = 0; k < 4; k++)
+                std::cout << surfaces[i].N[j][k] << " ";
+            std::cout << "\n";
+        }
+    }
 }
 
 void Solution::printH()
@@ -73,6 +125,28 @@ void Solution::printH()
     {
         for (int j = 0; j < amountOfNodes; j++)
             std::cout << H[i][j] << " ";
+        std::cout << "\n";
+    }
+}
+
+void Element::printH()
+{
+    std::cout << "\n=== H (Local): ===\n";
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << H[i][j] << " ";
+        std::cout << "\n";
+    }
+}
+
+void Element::printHbc()
+{
+    std::cout << "\n=== Hbc (Local): ===\n";
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << Hbc[i][j] << " ";
         std::cout << "\n";
     }
 }

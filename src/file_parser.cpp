@@ -58,11 +58,22 @@ void GlobalData::parseFile(const std::string &fileName)
         std::string temp;
 
         iss.ignore(std::numeric_limits<std::streamsize>::max(), ',');
-        for (int j = 0; j < NODES_PER_ELEMENT; j++)
+        for (int j = 0; j < 4; j++)
         {
             iss >> temp;
             grid.elements[i].nodeIds[j] = std::stoi(temp) - 1;
         }
+    }
+
+    // Loads Boundary Conditions
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::string line;
+    while (std::getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string value;
+        while (iss >> value)
+            grid.nodes[std::stoi(value) - 1].isBoundary = true;
     }
 
     file.close();

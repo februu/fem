@@ -2,7 +2,6 @@
 
 #include "quad.h"
 
-const int NODES_PER_ELEMENT = 4;
 const int NUMBER_OF_INTEGRATION_POINTS_2D = NUMBER_OF_INTEGRATION_POINTS * NUMBER_OF_INTEGRATION_POINTS;
 
 struct Jacobian
@@ -20,6 +19,7 @@ struct Jacobian
 struct Node
 {
     double x, y;
+    bool isBoundary = false;
 
     Node() : x(0.0), y(0.0) {}
     Node(double x, double y) : x(x), y(y) {}
@@ -27,11 +27,20 @@ struct Node
 
 struct Element
 {
-    int nodeIds[NODES_PER_ELEMENT];
+    int nodeIds[4];
     Jacobian jacobians[NUMBER_OF_INTEGRATION_POINTS_2D];
     double dN_dx[NUMBER_OF_INTEGRATION_POINTS_2D][4];
     double dN_dy[NUMBER_OF_INTEGRATION_POINTS_2D][4];
     double H[4][4] = {0};
+    double Hbc[4][4] = {0};
+
+    void printH();
+    void printHbc();
+};
+
+struct Surface
+{
+    double N[NUMBER_OF_INTEGRATION_POINTS][4] = {0};
 };
 
 struct Grid
@@ -97,7 +106,10 @@ struct UniversalElement
     double dN_dKsi[NUMBER_OF_INTEGRATION_POINTS_2D][4];
     double dN_dEta[NUMBER_OF_INTEGRATION_POINTS_2D][4];
 
+    Surface surfaces[4];
+
     void initialize();
+    void print();
 };
 
 struct Solution

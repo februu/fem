@@ -1,6 +1,7 @@
 #include <iostream>
 #include "../include/data_containers.h"
 #include "../include/quad.h"
+#include "../include/gauss_elimination.h"
 
 void Jacobian::inverse()
 {
@@ -129,6 +130,27 @@ void Solution::printH()
     }
 }
 
+void Solution::printP()
+{
+    std::cout << "\n=== P (Global): ===\n";
+    for (int i = 0; i < amountOfNodes; i++)
+        std::cout << P[i] << " ";
+    std::cout << "\n";
+}
+
+void Solution::printT()
+{
+    std::cout << "\n=== T (Global): ===\n";
+    for (int i = 0; i < amountOfNodes; i++)
+        std::cout << T[i] << " ";
+    std::cout << "\n";
+}
+
+void Solution::solve()
+{
+    T = gaussElimination(H, P, amountOfNodes);
+}
+
 void Element::printH()
 {
     std::cout << "\n=== H (Local): ===\n";
@@ -149,4 +171,12 @@ void Element::printHbc()
             std::cout << Hbc[i][j] << " ";
         std::cout << "\n";
     }
+}
+
+void Element::printP()
+{
+    std::cout << "\n=== P (Local): ===\n";
+    for (int i = 0; i < 4; i++)
+        std::cout << P[i] << " ";
+    std::cout << "\n";
 }

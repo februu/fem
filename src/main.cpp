@@ -8,10 +8,8 @@ int main()
 {
 
   GlobalData globalData;
-  globalData.parseFile("Test1_4_4.txt");
+  globalData.parseFile("Test2_4_4_MixGrid.txt");
   // globalData.print();
-
-  std::cout << std::setprecision(5);
 
   UniversalElement uE;
   uE.initialize();
@@ -65,20 +63,37 @@ int main()
         for (int j = 0; j < NUMBER_OF_INTEGRATION_POINTS; j++)
           for (int k = 0; k < 4; k++)
             for (int l = 0; l < 4; l++)
-              if (k == firstNode || k == secondNode || l == firstNode || l == secondNode)
-                element->Hbc[k][l] += globalData.alfa * gaussWeights[NUMBER_OF_INTEGRATION_POINTS - 1][j] * uE.surfaces[i].N[j][k] * uE.surfaces[i].N[j][l] * detJ;
+              element->Hbc[k][l] += globalData.alfa * gaussWeights[NUMBER_OF_INTEGRATION_POINTS - 1][j] * uE.surfaces[i].N[j][k] * uE.surfaces[i].N[j][l] * detJ;
+
+        // Add to Local P
+        for (int j = 0; j < NUMBER_OF_INTEGRATION_POINTS; j++)
+          for (int k = 0; k < 4; k++)
+            element->P[k] += globalData.alfa * globalData.tot * gaussWeights[NUMBER_OF_INTEGRATION_POINTS - 1][j] * uE.surfaces[i].N[j][k] * detJ;
       }
 
-    // Add to global H
+    // Add local H, Hbc and local P to global H
     for (int k = 0; k < 4; k++)
       for (int l = 0; l < 4; l++)
+      {
         solution.H[element->nodeIds[k]][element->nodeIds[l]] += element->H[k][l];
+        solution.H[element->nodeIds[k]][element->nodeIds[l]] += element->Hbc[k][l];
+      }
+    for (int k = 0; k < 4; k++)
+      solution.P[element->nodeIds[k]] += element->P[k];
 
-    std::cout << "\nElement " << elementIndex + 1 << ":";
-    element->printHbc();
+    // std::cout << "\nElement " << elementIndex + 1 << ":";
+    // element->printH();
+    // element->printHbc();
+    // element->printP();
   }
 
-  // solution.printH();
+  solution.printH();
+  solution.printP();
+
+  //[H]*[T] + [P] = 0
+  // Solve using Gaussian Elimination
+  solution.solve();
+  solution.printT();
 
   return 0;
 }

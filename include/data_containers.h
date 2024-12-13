@@ -33,9 +33,11 @@ struct Element
     double dN_dy[NUMBER_OF_INTEGRATION_POINTS_2D][4];
     double H[4][4] = {0};
     double Hbc[4][4] = {0};
+    double P[4] = {0};
 
     void printH();
     void printHbc();
+    void printP();
 };
 
 struct Surface
@@ -114,7 +116,7 @@ struct UniversalElement
 
 struct Solution
 {
-    double **H;
+    double **H, *P, *T;
     int amountOfNodes;
 
     Solution(int amountOfNodes) : amountOfNodes(amountOfNodes)
@@ -126,6 +128,14 @@ struct Solution
         for (int i = 0; i < amountOfNodes; i++)
             for (int j = 0; j < amountOfNodes; j++)
                 H[i][j] = 0;
+
+        P = new double[amountOfNodes];
+        for (int i = 0; i < amountOfNodes; i++)
+            P[i] = 0;
+
+        T = new double[amountOfNodes];
+        for (int i = 0; i < amountOfNodes; i++)
+            T[i] = 0;
     }
 
     Solution(const Solution &other) : amountOfNodes(other.amountOfNodes)
@@ -137,6 +147,14 @@ struct Solution
         for (int i = 0; i < amountOfNodes; i++)
             for (int j = 0; j < amountOfNodes; j++)
                 H[i][j] = other.H[i][j];
+
+        P = new double[amountOfNodes];
+        for (int i = 0; i < amountOfNodes; i++)
+            P[i] = other.P[i];
+
+        T = new double[amountOfNodes];
+        for (int i = 0; i < amountOfNodes; i++)
+            T[i] = other.T[i];
     }
 
     Solution &operator=(const Solution &other)
@@ -156,6 +174,14 @@ struct Solution
             for (int i = 0; i < amountOfNodes; i++)
                 for (int j = 0; j < amountOfNodes; j++)
                     H[i][j] = other.H[i][j];
+
+            P = new double[amountOfNodes];
+            for (int i = 0; i < amountOfNodes; i++)
+                P[i] = other.P[i];
+
+            T = new double[amountOfNodes];
+            for (int i = 0; i < amountOfNodes; i++)
+                T[i] = other.T[i];
         }
         return *this;
     }
@@ -165,7 +191,12 @@ struct Solution
         for (int i = 0; i < amountOfNodes; i++)
             delete[] H[i];
         delete[] H;
+        delete[] P;
+        delete[] T;
     }
 
     void printH();
+    void printP();
+    void printT();
+    void solve();
 };

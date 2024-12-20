@@ -8,7 +8,7 @@ int main()
 {
 
   GlobalData globalData;
-  globalData.parseFile("Test2_4_4_MixGrid.txt");
+  globalData.parseFile("Test1_4_4.txt");
   // globalData.print();
 
   UniversalElement uE;
@@ -16,6 +16,10 @@ int main()
 
   Grid grid = globalData.grid;
   Solution solution(grid.amountOfNodes);
+
+  // for (int time = 0; time <= globalData.simulationTime; time += globalData.simulationStep) {
+
+  // }
 
   // Loop over all elements
   for (int elementIndex = 0; elementIndex < grid.amountOfElements; elementIndex++)
@@ -47,6 +51,14 @@ int main()
         for (int k = 0; k < 4; k++)
           for (int l = 0; l < 4; l++)
             element->H[k][l] += globalData.conductivity * (element->dN_dx[currentIndex][k] * element->dN_dx[currentIndex][l] + element->dN_dy[currentIndex][k] * element->dN_dy[currentIndex][l]) * element->jacobians[currentIndex].detJ * gaussWeights[NUMBER_OF_INTEGRATION_POINTS - 1][i] * gaussWeights[NUMBER_OF_INTEGRATION_POINTS - 1][j];
+
+        // Add to Local C
+        for (int k = 0; k < 4; k++)
+          for (int l = 0; l < 4; l++)
+          {
+            std::cout << uE.N[currentIndex][k] << " " << uE.N[currentIndex][l] << " " << element->jacobians[currentIndex].detJ << "\n";
+            element->C[k][l] += globalData.density * globalData.specificHeat * uE.N[currentIndex][k] * uE.N[currentIndex][l] * element->jacobians[currentIndex].detJ;
+          }
       }
 
     // Check each of the 4 sides for BC
@@ -72,28 +84,33 @@ int main()
       }
 
     // Add local H, Hbc and local P to global H
+    // Add local C to global C
     for (int k = 0; k < 4; k++)
       for (int l = 0; l < 4; l++)
       {
         solution.H[element->nodeIds[k]][element->nodeIds[l]] += element->H[k][l];
         solution.H[element->nodeIds[k]][element->nodeIds[l]] += element->Hbc[k][l];
+        solution.C[element->nodeIds[k]][element->nodeIds[l]] += element->C[k][l];
       }
     for (int k = 0; k < 4; k++)
       solution.P[element->nodeIds[k]] += element->P[k];
 
-    // std::cout << "\nElement " << elementIndex + 1 << ":";
+    std::cout << "\n========== Element " << elementIndex + 1 << " ========== \n";
     // element->printH();
+    element->printC();
     // element->printHbc();
     // element->printP();
   }
 
-  solution.printH();
-  solution.printP();
+  // solution.printH();
+  // solution.printP();
 
   //[H]*[T] + [P] = 0
   // Solve using Gaussian Elimination
   solution.solve();
-  solution.printT();
+  // solution.printT();
+
+  // uE.print();
 
   return 0;
 }

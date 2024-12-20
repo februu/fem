@@ -85,6 +85,21 @@ void UniversalElement::initialize()
             surfaces[3].N[j][0] = 0.5 * (1 - gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
             surfaces[3].N[j][3] = 0.5 * (1 + gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j]);
         }
+
+    // Calculate N in integration points
+    for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS; i++)
+        for (int j = 0; j < NUMBER_OF_INTEGRATION_POINTS; j++)
+        {
+            int currentIndex = i * NUMBER_OF_INTEGRATION_POINTS + j;
+
+            double ksi = gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][i];
+            double eta = gaussNodes[NUMBER_OF_INTEGRATION_POINTS - 1][j];
+
+            N[currentIndex][0] = 0.25 * (1 - ksi) * (1 - eta);
+            N[currentIndex][1] = 0.25 * (1 + ksi) * (1 - eta);
+            N[currentIndex][2] = 0.25 * (1 + ksi) * (1 + eta);
+            N[currentIndex][3] = 0.25 * (1 - ksi) * (1 + eta);
+        }
 }
 
 void UniversalElement::print()
@@ -117,6 +132,14 @@ void UniversalElement::print()
             std::cout << "\n";
         }
     }
+
+    std::cout << "N:\n";
+    for (int i = 0; i < NUMBER_OF_INTEGRATION_POINTS_2D; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << N[i][j] << " ";
+        std::cout << "\n";
+    }
 }
 
 void Solution::printH()
@@ -126,6 +149,17 @@ void Solution::printH()
     {
         for (int j = 0; j < amountOfNodes; j++)
             std::cout << H[i][j] << " ";
+        std::cout << "\n";
+    }
+}
+
+void Solution::printC()
+{
+    std::cout << "\n=== C (Global): ===\n";
+    for (int i = 0; i < amountOfNodes; i++)
+    {
+        for (int j = 0; j < amountOfNodes; j++)
+            std::cout << C[i][j] << " ";
         std::cout << "\n";
     }
 }
@@ -158,6 +192,17 @@ void Element::printH()
     {
         for (int j = 0; j < 4; j++)
             std::cout << H[i][j] << " ";
+        std::cout << "\n";
+    }
+}
+
+void Element::printC()
+{
+    std::cout << "\n=== C (Local): ===\n";
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << C[i][j] << " ";
         std::cout << "\n";
     }
 }

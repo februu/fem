@@ -32,10 +32,12 @@ struct Element
     double dN_dx[NUMBER_OF_INTEGRATION_POINTS_2D][4];
     double dN_dy[NUMBER_OF_INTEGRATION_POINTS_2D][4];
     double H[4][4] = {0};
+    double C[4][4] = {0};
     double Hbc[4][4] = {0};
     double P[4] = {0};
 
     void printH();
+    void printC();
     void printHbc();
     void printP();
 };
@@ -108,6 +110,8 @@ struct UniversalElement
     double dN_dKsi[NUMBER_OF_INTEGRATION_POINTS_2D][4];
     double dN_dEta[NUMBER_OF_INTEGRATION_POINTS_2D][4];
 
+    double N[NUMBER_OF_INTEGRATION_POINTS_2D][4];
+
     Surface surfaces[4];
 
     void initialize();
@@ -116,7 +120,7 @@ struct UniversalElement
 
 struct Solution
 {
-    double **H, *P, *T;
+    double **H, **C, *P, *T;
     int amountOfNodes;
 
     Solution(int amountOfNodes) : amountOfNodes(amountOfNodes)
@@ -125,9 +129,17 @@ struct Solution
         for (int i = 0; i < amountOfNodes; i++)
             H[i] = new double[amountOfNodes];
 
+        C = new double *[amountOfNodes];
+        for (int i = 0; i < amountOfNodes; i++)
+            C[i] = new double[amountOfNodes];
+
         for (int i = 0; i < amountOfNodes; i++)
             for (int j = 0; j < amountOfNodes; j++)
                 H[i][j] = 0;
+
+        for (int i = 0; i < amountOfNodes; i++)
+            for (int j = 0; j < amountOfNodes; j++)
+                C[i][j] = 0;
 
         P = new double[amountOfNodes];
         for (int i = 0; i < amountOfNodes; i++)
@@ -144,9 +156,17 @@ struct Solution
         for (int i = 0; i < amountOfNodes; i++)
             H[i] = new double[amountOfNodes];
 
+        C = new double *[amountOfNodes];
+        for (int i = 0; i < amountOfNodes; i++)
+            C[i] = new double[amountOfNodes];
+
         for (int i = 0; i < amountOfNodes; i++)
             for (int j = 0; j < amountOfNodes; j++)
                 H[i][j] = other.H[i][j];
+
+        for (int i = 0; i < amountOfNodes; i++)
+            for (int j = 0; j < amountOfNodes; j++)
+                C[i][j] = other.C[i][j];
 
         P = new double[amountOfNodes];
         for (int i = 0; i < amountOfNodes; i++)
@@ -157,45 +177,20 @@ struct Solution
             T[i] = other.T[i];
     }
 
-    Solution &operator=(const Solution &other)
-    {
-        if (this != &other)
-        {
-            for (int i = 0; i < amountOfNodes; i++)
-                delete[] H[i];
-            delete[] H;
-
-            amountOfNodes = other.amountOfNodes;
-
-            H = new double *[amountOfNodes];
-            for (int i = 0; i < amountOfNodes; i++)
-                H[i] = new double[amountOfNodes];
-
-            for (int i = 0; i < amountOfNodes; i++)
-                for (int j = 0; j < amountOfNodes; j++)
-                    H[i][j] = other.H[i][j];
-
-            P = new double[amountOfNodes];
-            for (int i = 0; i < amountOfNodes; i++)
-                P[i] = other.P[i];
-
-            T = new double[amountOfNodes];
-            for (int i = 0; i < amountOfNodes; i++)
-                T[i] = other.T[i];
-        }
-        return *this;
-    }
-
     ~Solution()
     {
         for (int i = 0; i < amountOfNodes; i++)
             delete[] H[i];
+        for (int i = 0; i < amountOfNodes; i++)
+            delete[] C[i];
         delete[] H;
+        delete[] C;
         delete[] P;
         delete[] T;
     }
 
     void printH();
+    void printC();
     void printP();
     void printT();
     void solve();

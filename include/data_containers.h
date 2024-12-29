@@ -122,32 +122,23 @@ struct Solution
 {
     double **H, **C, *P, *T;
     int amountOfNodes;
+    int simulationStep;
 
-    Solution(int amountOfNodes) : amountOfNodes(amountOfNodes)
+    Solution(int amountOfNodes, int initialTemp, int simulationStep) : amountOfNodes(amountOfNodes), simulationStep(simulationStep)
     {
         H = new double *[amountOfNodes];
         for (int i = 0; i < amountOfNodes; i++)
-            H[i] = new double[amountOfNodes];
+            H[i] = new double[amountOfNodes]();
 
         C = new double *[amountOfNodes];
         for (int i = 0; i < amountOfNodes; i++)
-            C[i] = new double[amountOfNodes];
+            C[i] = new double[amountOfNodes]();
 
-        for (int i = 0; i < amountOfNodes; i++)
-            for (int j = 0; j < amountOfNodes; j++)
-                H[i][j] = 0;
-
-        for (int i = 0; i < amountOfNodes; i++)
-            for (int j = 0; j < amountOfNodes; j++)
-                C[i][j] = 0;
-
-        P = new double[amountOfNodes];
-        for (int i = 0; i < amountOfNodes; i++)
-            P[i] = 0;
+        P = new double[amountOfNodes]();
 
         T = new double[amountOfNodes];
         for (int i = 0; i < amountOfNodes; i++)
-            T[i] = 0;
+            T[i] = initialTemp;
     }
 
     Solution(const Solution &other) : amountOfNodes(other.amountOfNodes)
@@ -193,5 +184,6 @@ struct Solution
     void printC();
     void printP();
     void printT();
+    void printTMinMax();
     void solve();
 };

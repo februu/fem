@@ -180,9 +180,51 @@ void Solution::printT()
     std::cout << "\n";
 }
 
+void Solution::printTMinMax()
+{
+    double minVal = T[0];
+    double maxVal = T[0];
+
+    for (int i = 1; i < amountOfNodes; i++)
+    {
+        if (T[i] < minVal)
+            minVal = T[i];
+        if (T[i] > maxVal)
+            maxVal = T[i];
+    }
+
+    std::cout << minVal << "\t" << maxVal << "\n";
+}
+
 void Solution::solve()
 {
-    T = gaussElimination(H, P, amountOfNodes);
+    // Solve using Gaussian Elimination
+    // ([H] + [C] / dt) * {T1} - ([C] / dt) * {T0} + {P} = 0
+    // In the next iteration use T1 as T0
+
+    double **A = new double *[amountOfNodes];
+    for (int i = 0; i < amountOfNodes; i++)
+    {
+        A[i] = new double[amountOfNodes]();
+        for (int j = 0; j < amountOfNodes; j++)
+            A[i][j] = H[i][j] + (C[i][j] / simulationStep);
+    }
+
+    double *B = new double[amountOfNodes]();
+
+    for (int i = 0; i < amountOfNodes; ++i)
+    {
+        for (int j = 0; j < amountOfNodes; ++j)
+            B[i] += C[i][j] / simulationStep * T[j];
+        B[i] += P[i];
+    }
+
+    T = gaussElimination(A, B, amountOfNodes);
+
+    for (int i = 0; i < amountOfNodes; i++)
+        delete[] A[i];
+    delete[] A;
+    delete[] B;
 }
 
 void Element::printH()

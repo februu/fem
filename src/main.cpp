@@ -8,18 +8,14 @@ int main()
 {
 
   GlobalData globalData;
-  globalData.parseFile("Test1_4_4.txt");
+  globalData.parseFile("Test2_4_4_MixGrid.txt");
   // globalData.print();
 
   UniversalElement uE;
   uE.initialize();
 
   Grid grid = globalData.grid;
-  Solution solution(grid.amountOfNodes);
-
-  // for (int time = 0; time <= globalData.simulationTime; time += globalData.simulationStep) {
-
-  // }
+  Solution solution(grid.amountOfNodes, globalData.initialTemperature, globalData.simulationStep);
 
   // Loop over all elements
   for (int elementIndex = 0; elementIndex < grid.amountOfElements; elementIndex++)
@@ -55,10 +51,7 @@ int main()
         // Add to Local C
         for (int k = 0; k < 4; k++)
           for (int l = 0; l < 4; l++)
-          {
-            std::cout << uE.N[currentIndex][k] << " " << uE.N[currentIndex][l] << " " << element->jacobians[currentIndex].detJ << "\n";
             element->C[k][l] += globalData.density * globalData.specificHeat * uE.N[currentIndex][k] * uE.N[currentIndex][l] * element->jacobians[currentIndex].detJ;
-          }
       }
 
     // Check each of the 4 sides for BC
@@ -95,22 +88,26 @@ int main()
     for (int k = 0; k < 4; k++)
       solution.P[element->nodeIds[k]] += element->P[k];
 
-    std::cout << "\n========== Element " << elementIndex + 1 << " ========== \n";
-    // element->printH();
-    element->printC();
-    // element->printHbc();
-    // element->printP();
+    // std::cout << "\n========== Element " << elementIndex + 1 << " ========== \n";
+    //  element->printH();
+    //  element->printC();
+    //  element->printHbc();
+    //  element->printP();
   }
 
+  // std::cout << "\n========== Solution ========== \n";
   // solution.printH();
   // solution.printP();
+  // solution.printC();
 
-  //[H]*[T] + [P] = 0
-  // Solve using Gaussian Elimination
-  solution.solve();
-  // solution.printT();
-
-  // uE.print();
-
+  for (int time = globalData.simulationStep; time <= globalData.simulationTime; time += globalData.simulationStep)
+  {
+    // [H]*[T] + [P] = 0
+    // Solve using Gaussian Elimination
+    solution.solve();
+    std::cout << time + globalData.simulationStep << "\t";
+    solution.printTMinMax();
+    // solution.printT();
+  }
   return 0;
 }

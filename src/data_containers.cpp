@@ -219,6 +219,7 @@ void Solution::solve()
         B[i] += P[i];
     }
 
+    delete[] T;
     T = gaussElimination(A, B, amountOfNodes);
 
     for (int i = 0; i < amountOfNodes; i++)

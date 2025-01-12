@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-const int NUMBER_OF_INTEGRATION_POINTS = 2;
+const int NUMBER_OF_INTEGRATION_POINTS = 4;
 
 const double gaussNodes[4][4] = {
     {0.0},

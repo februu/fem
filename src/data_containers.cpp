@@ -193,7 +193,7 @@ void Solution::printTMinMax()
             maxVal = T[i];
     }
 
-    std::cout << minVal << "\t" << maxVal << "\n";
+    std::cout << minVal << " & " << maxVal << " \\\\ \n";
 }
 
 void Solution::solve()
@@ -216,6 +216,7 @@ void Solution::solve()
     {
         for (int j = 0; j < amountOfNodes; ++j)
             B[i] += C[i][j] / simulationStep * T[j];
+
         B[i] += P[i];
     }
 

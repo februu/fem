@@ -8,7 +8,7 @@ int main()
 {
 
   GlobalData globalData;
-  globalData.parseFile("Test2_4_4_MixGrid.txt");
+  globalData.parseFile("Test1_4_4.txt");
   // globalData.print();
 
   UniversalElement uE;
@@ -27,9 +27,10 @@ int main()
       for (int j = 0; j < NUMBER_OF_INTEGRATION_POINTS; j++)
       {
 
-        // Calculate correct index
+        // Calculate correct point index
         int currentIndex = i * NUMBER_OF_INTEGRATION_POINTS + j;
 
+        // Calculate jacobian matrix
         element->jacobians[currentIndex].J[0][0] = uE.dN_dKsi[currentIndex][0] * grid.nodes[element->nodeIds[0]].x + uE.dN_dKsi[currentIndex][1] * grid.nodes[element->nodeIds[1]].x + uE.dN_dKsi[currentIndex][2] * grid.nodes[element->nodeIds[2]].x + uE.dN_dKsi[currentIndex][3] * grid.nodes[element->nodeIds[3]].x;
         element->jacobians[currentIndex].J[0][1] = uE.dN_dKsi[currentIndex][0] * grid.nodes[element->nodeIds[0]].y + uE.dN_dKsi[currentIndex][1] * grid.nodes[element->nodeIds[1]].y + uE.dN_dKsi[currentIndex][2] * grid.nodes[element->nodeIds[2]].y + uE.dN_dKsi[currentIndex][3] * grid.nodes[element->nodeIds[3]].y;
         element->jacobians[currentIndex].J[1][0] = uE.dN_dEta[currentIndex][0] * grid.nodes[element->nodeIds[0]].x + uE.dN_dEta[currentIndex][1] * grid.nodes[element->nodeIds[1]].x + uE.dN_dEta[currentIndex][2] * grid.nodes[element->nodeIds[2]].x + uE.dN_dEta[currentIndex][3] * grid.nodes[element->nodeIds[3]].x;
@@ -51,7 +52,7 @@ int main()
         // Add to Local C
         for (int k = 0; k < 4; k++)
           for (int l = 0; l < 4; l++)
-            element->C[k][l] += globalData.density * globalData.specificHeat * uE.N[currentIndex][k] * uE.N[currentIndex][l] * element->jacobians[currentIndex].detJ;
+            element->C[k][l] += globalData.density * globalData.specificHeat * uE.N[currentIndex][k] * uE.N[currentIndex][l] * element->jacobians[currentIndex].detJ * gaussWeights[NUMBER_OF_INTEGRATION_POINTS - 1][i] * gaussWeights[NUMBER_OF_INTEGRATION_POINTS - 1][j];
       }
 
     // Check each of the 4 sides for BC
@@ -89,23 +90,27 @@ int main()
       solution.P[element->nodeIds[k]] += element->P[k];
 
     // std::cout << "\n========== Element " << elementIndex + 1 << " ========== \n";
-    //  element->printH();
-    //  element->printC();
-    //  element->printHbc();
-    //  element->printP();
+    // element->printH();
+    // element->printC();
+    // element->printHbc();
+    // element->printP();
   }
+
+  // std::cout << "\n========== Universal Element ========== \n";
+  // uE.print();
 
   // std::cout << "\n========== Solution ========== \n";
   // solution.printH();
   // solution.printP();
   // solution.printC();
 
-  for (int time = globalData.simulationStep; time <= globalData.simulationTime; time += globalData.simulationStep)
+  for (int time = 0; time < globalData.simulationTime; time += globalData.simulationStep)
   {
     // [H]*[T] + [P] = 0
     // Solve using Gaussian Elimination
     solution.solve();
-    std::cout << time + globalData.simulationStep << "\t";
+    // std::cout << time + globalData.simulationStep << "\t";
+    std::cout << time + globalData.simulationStep << " & ";
     solution.printTMinMax();
     // solution.printT();
   }

@@ -193,7 +193,7 @@ void Solution::printTMinMax()
             maxVal = T[i];
     }
 
-    std::cout << minVal << " & " << maxVal << " \\\\ \n";
+    std::cout << minVal << "\t" << maxVal << "\n";
 }
 
 void Solution::solve()

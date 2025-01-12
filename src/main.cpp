@@ -109,8 +109,7 @@ int main()
     // [H]*[T] + [P] = 0
     // Solve using Gaussian Elimination
     solution.solve();
-    // std::cout << time + globalData.simulationStep << "\t";
-    std::cout << time + globalData.simulationStep << " & ";
+    std::cout << time + globalData.simulationStep << "\t";
     solution.printTMinMax();
     // solution.printT();
   }

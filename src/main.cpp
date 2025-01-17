@@ -77,7 +77,7 @@ int main()
             element->P[k] += globalData.alfa * globalData.tot * gaussWeights[NUMBER_OF_INTEGRATION_POINTS - 1][j] * uE.surfaces[i].N[j][k] * detJ;
       }
 
-    // Add local H, Hbc and local P to global H
+    // Add local H, Hbc to global H
     // Add local C to global C
     for (int k = 0; k < 4; k++)
       for (int l = 0; l < 4; l++)
@@ -86,6 +86,8 @@ int main()
         solution.H[element->nodeIds[k]][element->nodeIds[l]] += element->Hbc[k][l];
         solution.C[element->nodeIds[k]][element->nodeIds[l]] += element->C[k][l];
       }
+
+    // Add local P to global P
     for (int k = 0; k < 4; k++)
       solution.P[element->nodeIds[k]] += element->P[k];
 
@@ -106,7 +108,6 @@ int main()
 
   for (int time = 0; time < globalData.simulationTime; time += globalData.simulationStep)
   {
-    // [H]*[T] + [P] = 0
     // Solve using Gaussian Elimination
     solution.solve();
     std::cout << time + globalData.simulationStep << "\t";
